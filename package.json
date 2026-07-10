@@ -1,0 +1,20 @@
+{
+  "name": "truthlens-ai",
+  "private": true,
+  "version": "0.1.0",
+  "description": "TruthLens AI - Multimodal Digital Trust & Forensics Platform",
+  "scripts": {
+    "dev:web": "npm --workspace apps/web run dev",
+    "build:web": "npm --workspace apps/web run build",
+    "lint:web": "npm --workspace apps/web run lint",
+    "preview:web": "npm --workspace apps/web run preview"
+  },
+  "workspaces": [
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
+

@@ -1,0 +1,31 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api/v1
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      APP_NAME: ${APP_NAME:-TruthLens AI}
+      API_CORS_ORIGINS: http://localhost:5173
+      FRONTEND_URL: http://localhost:5173
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-dev-access-secret-change-me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-dev-refresh-secret-change-me}
+      ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-15}
+      REFRESH_TOKEN_DAYS: ${REFRESH_TOKEN_DAYS:-7}
+      EMAIL_TOKEN_MINUTES: ${EMAIL_TOKEN_MINUTES:-60}
+      PASSWORD_RESET_MINUTES: ${PASSWORD_RESET_MINUTES:-30}
+      MONGODB_URI: ${MONGODB_URI:-mongodb://host.docker.internal:27017}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-truthlens_ai}
