@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     refresh_token_days: int = Field(default=7, alias="REFRESH_TOKEN_DAYS")
     email_token_minutes: int = Field(default=60, alias="EMAIL_TOKEN_MINUTES")
     password_reset_minutes: int = Field(default=30, alias="PASSWORD_RESET_MINUTES")
+    upload_storage_dir: str = Field(default=str(PROJECT_ROOT / "storage" / "uploads"), alias="UPLOAD_STORAGE_DIR")
+    upload_url_prefix: str = Field(default="/storage/uploads", alias="UPLOAD_URL_PREFIX")
+    max_image_upload_mb: int = Field(default=20, alias="MAX_IMAGE_UPLOAD_MB")
 
     model_config = SettingsConfigDict(
         env_file=(PROJECT_ROOT / ".env", API_ROOT / ".env"),
@@ -34,6 +37,17 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.api_cors_origins.split(",") if origin.strip()]
+
+    @property
+    def max_image_upload_bytes(self) -> int:
+        return self.max_image_upload_mb * 1024 * 1024
+
+    @property
+    def resolved_upload_storage_dir(self) -> str:
+        path = Path(self.upload_storage_dir)
+        if path.is_absolute():
+            return str(path)
+        return str(PROJECT_ROOT / path)
 
 
 @lru_cache

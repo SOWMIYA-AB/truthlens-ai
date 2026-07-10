@@ -36,6 +36,8 @@ async def ensure_database_indexes() -> None:
         await database.users.create_index([("email", ASCENDING)], unique=True)
         await database.users.create_index([("role", ASCENDING)])
         await database.users.create_index([("createdAt", ASCENDING)])
+        await database.uploads.create_index([("userId", ASCENDING)])
+        await database.uploads.create_index([("createdAt", ASCENDING)])
     except PyMongoError:
         return
 

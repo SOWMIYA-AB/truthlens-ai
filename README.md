@@ -20,6 +20,8 @@ This repository currently contains the completed foundation through **Milestone 
 - Protected frontend routes
 - User/Admin RBAC dependencies
 - MongoDB `users` collection with indexes
+- Authenticated image upload endpoint
+- Local image storage with MongoDB upload metadata
 - Dockerfiles
 - Docker Compose
 - GitHub Actions CI workflow
@@ -142,7 +144,10 @@ GET /api/v1/auth/me
 GET /api/v1/users/me
 PATCH /api/v1/users/me
 GET /api/v1/users
+POST /api/v1/uploads/image
 ```
+
+Image upload accepts `JPG`, `JPEG`, `PNG`, and `WEBP` files up to 20 MB. Uploaded files are stored in `storage/uploads`, and metadata is saved in MongoDB.
 
 Example response:
 
@@ -163,7 +168,9 @@ Milestone 1: Project setup and platform foundation. Complete.
 
 Milestone 2: Authentication and user accounts. Complete.
 
-Milestone 3: Dashboard.
+Milestone 3 Part 1: Image upload module. Complete.
+
+Milestone 3 Part 2: Dashboard.
 
 Milestone 4: Image analysis workflow.
 

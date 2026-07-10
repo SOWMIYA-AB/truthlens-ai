@@ -10,6 +10,7 @@ import { SignupPage } from './features/auth/SignupPage';
 import { LandingPage } from './features/landing/LandingPage';
 import { NotFoundPage } from './features/not-found/NotFoundPage';
 import { ProfilePage } from './features/profile/ProfilePage';
+import { UploadPage } from './features/uploads/UploadPage';
 
 export function App() {
   return (
@@ -26,6 +27,7 @@ export function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppShell />}>
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/upload" element={<UploadPage />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />

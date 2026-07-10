@@ -1,4 +1,4 @@
-import { Activity, LogOut, UserRound } from 'lucide-react';
+import { Activity, LogOut, Upload, UserRound } from 'lucide-react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 
@@ -26,6 +26,13 @@ export function AppShell() {
           </Link>
           <div className="flex items-center gap-3">
             <Link
+              to="/upload"
+              className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+            >
+              <Upload size={16} aria-hidden="true" />
+              Upload
+            </Link>
+            <Link
               to="/profile"
               className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
             >
@@ -47,4 +54,3 @@ export function AppShell() {
     </main>
   );
 }
-
