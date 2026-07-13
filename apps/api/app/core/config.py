@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     upload_storage_dir: str = Field(default=str(PROJECT_ROOT / "storage" / "uploads"), alias="UPLOAD_STORAGE_DIR")
     upload_url_prefix: str = Field(default="/storage/uploads", alias="UPLOAD_URL_PREFIX")
     max_image_upload_mb: int = Field(default=20, alias="MAX_IMAGE_UPLOAD_MB")
+    image_analysis_model_name: str = Field(default="efficientnet_b3", alias="IMAGE_ANALYSIS_MODEL_NAME")
+    image_analysis_model_checkpoint: str | None = Field(default=None, alias="IMAGE_ANALYSIS_MODEL_CHECKPOINT")
 
     model_config = SettingsConfigDict(
         env_file=(PROJECT_ROOT / ".env", API_ROOT / ".env"),
@@ -45,6 +47,16 @@ class Settings(BaseSettings):
     @property
     def resolved_upload_storage_dir(self) -> str:
         path = Path(self.upload_storage_dir)
+        if path.is_absolute():
+            return str(path)
+        return str(PROJECT_ROOT / path)
+
+    @property
+    def resolved_image_analysis_checkpoint(self) -> str | None:
+        if not self.image_analysis_model_checkpoint:
+            return None
+
+        path = Path(self.image_analysis_model_checkpoint)
         if path.is_absolute():
             return str(path)
         return str(PROJECT_ROOT / path)

@@ -22,6 +22,8 @@ This repository currently contains the completed foundation through **Milestone 
 - MongoDB `users` collection with indexes
 - Authenticated image upload endpoint
 - Local image storage with MongoDB upload metadata
+- Local EfficientNet-B3 image authenticity analysis
+- MongoDB analysis metadata persistence
 - Dockerfiles
 - Docker Compose
 - GitHub Actions CI workflow
@@ -145,9 +147,12 @@ GET /api/v1/users/me
 PATCH /api/v1/users/me
 GET /api/v1/users
 POST /api/v1/uploads/image
+POST /api/v1/analysis/image
 ```
 
 Image upload accepts `JPG`, `JPEG`, `PNG`, and `WEBP` files up to 20 MB. Uploaded files are stored in `storage/uploads`, and metadata is saved in MongoDB.
+
+Image analysis accepts an uploaded image ID, loads the stored file, preprocesses it locally, runs EfficientNet-B3 inference, and saves the result in MongoDB. No external AI APIs are used.
 
 Example response:
 
@@ -170,7 +175,9 @@ Milestone 2: Authentication and user accounts. Complete.
 
 Milestone 3 Part 1: Image upload module. Complete.
 
-Milestone 3 Part 2: Dashboard.
+Milestone 3 Part 2: Image authenticity detection module. Complete.
+
+Milestone 3 Part 3: Dashboard.
 
 Milestone 4: Image analysis workflow.
 

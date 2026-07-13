@@ -1,7 +1,10 @@
 import { ChangeEvent, DragEvent, FormEvent, useEffect, useRef, useState } from 'react';
-import { ImagePlus, UploadCloud, X } from 'lucide-react';
+import { ImagePlus, LoaderCircle, UploadCloud, X } from 'lucide-react';
+import { analyzeImage } from '../../services/analysisApi';
 import { uploadImage } from '../../services/uploadApi';
+import type { ImageAnalysisResponse } from '../../types/analysis';
 import type { ImageUploadResponse } from '../../types/upload';
+import { AnalysisResultCard } from './AnalysisResultCard';
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE_BYTES = 20 * 1024 * 1024;
@@ -25,8 +28,11 @@ export function UploadPage() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [analysisError, setAnalysisError] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<ImageUploadResponse | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<ImageAnalysisResponse | null>(null);
 
   useEffect(() => {
     if (!file) {
@@ -42,7 +48,9 @@ export function UploadPage() {
   function selectFile(selectedFile: File | undefined) {
     setError('');
     setSuccess('');
+    setAnalysisError('');
     setUploadedImage(null);
+    setAnalysisResult(null);
     setProgress(0);
 
     if (!selectedFile) {
@@ -78,25 +86,41 @@ export function UploadPage() {
     setUploading(true);
     setError('');
     setSuccess('');
+    setAnalysisError('');
+    setAnalysisResult(null);
     setProgress(0);
+    let uploadCompleted = false;
 
     try {
       const response = await uploadImage(file, setProgress);
+      uploadCompleted = true;
       setUploadedImage(response);
       setSuccess('Image uploaded successfully.');
       setProgress(100);
+
+      setAnalyzing(true);
+      const analysis = await analyzeImage(response.id);
+      setAnalysisResult(analysis);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Image upload failed.');
+      const message = err instanceof Error ? err.message : 'Image upload failed.';
+      if (uploadCompleted) {
+        setAnalysisError(message);
+      } else {
+        setError(message);
+      }
     } finally {
       setUploading(false);
+      setAnalyzing(false);
     }
   }
 
   function clearSelection() {
     setFile(null);
     setUploadedImage(null);
+    setAnalysisResult(null);
     setSuccess('');
     setError('');
+    setAnalysisError('');
     setProgress(0);
     if (inputRef.current) {
       inputRef.current.value = '';
@@ -106,10 +130,10 @@ export function UploadPage() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8">
-        <p className="text-sm font-semibold uppercase tracking-wide text-signal">Milestone 3 Part 1</p>
-        <h1 className="mt-2 text-4xl font-bold">Image Upload</h1>
+        <p className="text-sm font-semibold uppercase tracking-wide text-signal">Milestone 3 Part 2</p>
+        <h1 className="mt-2 text-4xl font-bold">Image Authenticity</h1>
         <p className="mt-3 max-w-2xl text-slate-600">
-          Upload JPG, JPEG, PNG, or WEBP images for secure storage. Analysis modules are not enabled yet.
+          Upload JPG, JPEG, PNG, or WEBP images, then run local EfficientNet-B3 authenticity inference.
         </p>
       </div>
 
@@ -166,13 +190,14 @@ export function UploadPage() {
 
           {error && <p className="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
           {success && <p className="mt-5 rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</p>}
+          {analysisError && <p className="mt-5 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{analysisError}</p>}
 
           <button
             type="submit"
-            disabled={uploading || !file}
+            disabled={uploading || analyzing || !file}
             className="mt-6 rounded-lg bg-ink px-5 py-3 text-sm font-semibold text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {uploading ? 'Uploading...' : 'Upload image'}
+            {uploading ? 'Uploading...' : analyzing ? 'Analyzing...' : 'Upload and analyze'}
           </button>
         </form>
 
@@ -219,7 +244,22 @@ export function UploadPage() {
           )}
         </aside>
       </div>
+
+      {analyzing && (
+        <div className="mt-6 flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-5 text-blue-800">
+          <LoaderCircle className="animate-spin" size={22} aria-hidden="true" />
+          <div>
+            <p className="font-semibold">Running EfficientNet-B3 inference</p>
+            <p className="text-sm">The image is being preprocessed and analyzed locally.</p>
+          </div>
+        </div>
+      )}
+
+      {analysisResult && (
+        <div className="mt-6">
+          <AnalysisResultCard result={analysisResult} />
+        </div>
+      )}
     </section>
   );
 }
-
